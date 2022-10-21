@@ -73,3 +73,5 @@ STATIC_ASSERT(sizeof(void*) == 8, "Nara does not support 32-bit platforms!");
 #		define NAPI
 #	endif
 #endif
+
+#define NARA_ASSERTIONS 1
