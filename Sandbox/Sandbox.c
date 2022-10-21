@@ -2,6 +2,9 @@
 #include <Nara/Nara.h>
 
 B8 Sandbox_Initialize() {
+	void* ptr = Allocate(64, MemoryTag_Application);
+	Free(ptr);
+
 	return 1;
 }
 

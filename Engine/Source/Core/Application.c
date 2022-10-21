@@ -1,5 +1,6 @@
 #include <Nara/Core/Application.h>
 #include <Nara/Core/Log.h>
+#include <Nara/Core/Memory.h>
 #include <Nara/Platform/Platform.h>
 
 static ApplicationConfig Config = {};
@@ -8,6 +9,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 	if (!Platform_Initialize(config->Name, config->WindowX, config->WindowY, config->WindowW, config->WindowH)) {
 		return 0;
 	}
+	if (!Memory_Initialize()) { return 0; }
 
 	Platform_MemCopy(&Config, config, sizeof(ApplicationConfig));
 
@@ -22,6 +24,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 }
 
 void Application_Shutdown() {
+	Memory_Shutdown();
 	Platform_Shutdown();
 }
 
