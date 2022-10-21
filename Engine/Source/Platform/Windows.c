@@ -125,6 +125,21 @@ void* Platform_Allocate(U64 size, U64 alignment) {
 	return (void*) addr;
 }
 
+void* Platform_Reallocate(void* ptr, U64 size, U64 alignment) {
+	if (ptr == NULL) { return Platform_Allocate(size, alignment); }
+
+	void** p = (void**) ptr;
+	ptr      = p[-1];
+
+	const U64 actualSize = size + alignment + sizeof(uintptr_t);
+	void* newPtr         = realloc(ptr, actualSize);
+	uintptr_t userPtr    = ((uintptr_t) newPtr + sizeof(uintptr_t) + alignment) & ~(alignment - 1);
+	p                    = (void**) newPtr;
+	p[-1]                = newPtr;
+
+	return (void*) userPtr;
+}
+
 void Platform_Free(void* ptr) {
 	if (ptr != NULL) {
 		void** p = (void**) ptr;
@@ -134,6 +149,10 @@ void Platform_Free(void* ptr) {
 
 void Platform_MemCopy(void* dst, const void* src, U64 size) {
 	memcpy(dst, src, size);
+}
+
+void Platform_MemMove(void* dst, const void* src, U64 size) {
+	memmove(dst, src, size);
 }
 
 void Platform_MemSet(void* dst, U8 value, U64 size) {

@@ -5,7 +5,7 @@
 
 static const char* MemoryTag_Names[] = {"Unknown",
                                         "Array",
-                                        "DynArray",
+                                        "DynamicArray",
                                         "Dictionary",
                                         "RingQueue",
                                         "BST",
@@ -94,6 +94,37 @@ void* AllocateAligned(U64 size, U64 alignment, MemoryTag tag) {
 	return ret;
 }
 
+void* Reallocate(void* ptr, U64 size, MemoryTag tag) {
+	return ReallocateAligned(ptr, size, 1, tag);
+}
+
+void* ReallocateAligned(void* ptr, U64 size, U64 alignment, MemoryTag tag) {
+	if (ptr == NULL) { return AllocateAligned(size, alignment, tag); }
+
+	const U64 padding    = alignment > sizeof(MemoryHeader) ? alignment : sizeof(MemoryHeader);
+	const U64 actualSize = size + padding;
+
+	MemoryHeader* header   = &((MemoryHeader*) ptr)[-1];
+	const U64 oldSize      = header->Size;
+	const MemoryTag oldTag = header->Tag;
+
+	void* ret    = NULL;
+	void* newPtr = Platform_Reallocate(header->Original, actualSize, alignment);
+	if (newPtr != NULL) {
+		ret                  = newPtr + padding;
+		MemoryHeader* header = &((MemoryHeader*) ret)[-1];
+		header->Original     = newPtr;
+		header->Size         = size;
+		header->Tag          = tag;
+
+		Memory.TotalBytes += (-oldSize) + size;
+		Memory.BytesByTag[oldTag] -= oldSize;
+		Memory.BytesByTag[tag] += size;
+	}
+
+	return ret;
+}
+
 void Free(void* ptr) {
 	if (ptr == NULL) { return; }
 
@@ -108,6 +139,10 @@ void Free(void* ptr) {
 
 void MemCopy(void* dst, const void* src, U64 size) {
 	Platform_MemCopy(dst, src, size);
+}
+
+void MemMove(void* dst, const void* src, U64 size) {
+	Platform_MemMove(dst, src, size);
 }
 
 void MemSet(void* dst, U8 value, U64 size) {

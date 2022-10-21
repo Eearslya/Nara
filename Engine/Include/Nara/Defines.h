@@ -74,4 +74,14 @@ STATIC_ASSERT(sizeof(void*) == 8, "Nara does not support 32-bit platforms!");
 #	endif
 #endif
 
+#ifndef TRUE
+#	define TRUE 1
+#endif
+#ifndef FALSE
+#	define FALSE 0
+#endif
+#ifndef NULL
+#	define NULL 0
+#endif
+
 #define NARA_ASSERTIONS 1
