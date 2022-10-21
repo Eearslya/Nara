@@ -152,6 +152,12 @@ F64 Platform_GetTime() {
 }
 
 static LRESULT CALLBACK Platform_Message(HWND hwnd, U32 msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+		case WM_CLOSE:
+			PostQuitMessage(0);
+			break;
+	}
+
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 #endif /* NARA_WINDOWS */
