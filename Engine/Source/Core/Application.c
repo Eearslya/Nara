@@ -1,4 +1,5 @@
 #include <Nara/Core/Application.h>
+#include <Nara/Core/Event.h>
 #include <Nara/Core/Log.h>
 #include <Nara/Core/Memory.h>
 #include <Nara/Platform/Platform.h>
@@ -7,23 +8,25 @@ static ApplicationConfig Config = {};
 
 B8 Application_Initialize(const ApplicationConfig* config) {
 	if (!Platform_Initialize(config->Name, config->WindowX, config->WindowY, config->WindowW, config->WindowH)) {
-		return 0;
+		return FALSE;
 	}
-	if (!Memory_Initialize()) { return 0; }
+	if (!Memory_Initialize()) { return FALSE; }
+	if (!Event_Initialize()) { return FALSE; }
 
 	Platform_MemCopy(&Config, config, sizeof(ApplicationConfig));
 
 	if (!Config.Initialize()) {
 		LogF("[Application] Application failed to initialize!");
-		return 0;
+		return FALSE;
 	}
 
 	Config.OnResized(config->WindowW, config->WindowH);
 
-	return 1;
+	return TRUE;
 }
 
 void Application_Shutdown() {
+	Event_Shutdown();
 	Memory_Shutdown();
 	Platform_Shutdown();
 }
@@ -38,14 +41,14 @@ B8 Application_Run() {
 
 		if (!Config.Update((F32) deltaTime)) {
 			LogF("[Application] Application failed to update!");
-			return 0;
+			return FALSE;
 		}
 
 		if (!Config.Render((F32) deltaTime)) {
 			LogF("[Application] Application failed to render!");
-			return 0;
+			return FALSE;
 		}
 	}
 
-	return 1;
+	return TRUE;
 }

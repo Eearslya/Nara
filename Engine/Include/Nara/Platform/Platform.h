@@ -2,9 +2,9 @@
 
 #include <Nara/Defines.h>
 
-NAPI B8 Platform_Initialize(const char* appName, I32 startX, I32 startY, U32 width, U32 height);
-NAPI void Platform_Shutdown();
-NAPI B8 Platform_Update();
+B8 Platform_Initialize(const char* appName, I32 startX, I32 startY, U32 width, U32 height);
+void Platform_Shutdown();
+B8 Platform_Update();
 
 void* Platform_Allocate(U64 size, U64 alignment);
 void* Platform_Reallocate(void* ptr, U64 size, U64 alignment);

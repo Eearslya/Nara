@@ -179,3 +179,6 @@ NAPI void _DynArray_Extract(DynArrayT dynArray, U64 index, void* element);
 
 /** Convenience macro for _DynArray_Extract(). */
 #define DynArray_Extract(dynArray, index, element) _DynArray_Extract((DynArrayT) dynArray, index, (void*) element)
+
+/** Convenience macro to erase an element without extracting. */
+#define DynArray_Erase(dynArray, index) _DynArray_Extract((DynArrayT) dynArray, index, NULL)

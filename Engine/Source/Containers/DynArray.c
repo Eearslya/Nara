@@ -49,6 +49,8 @@ void* _DynArray_CreateSized(U64 elementSize, U64 elementCount) {
 }
 
 void _DynArray_Destroy(DynArrayT dynArray) {
+	if (dynArray == NULL) { return; }
+
 	DynArrayMetadata* meta = DynArrayGetMetadata(*dynArray);
 
 	// Pointer to the start of metadata is the same pointer we originally allocated.
