@@ -30,7 +30,9 @@ void Log_Output(LogLevel level, const char* fmt, ...) {
 
 	if (level > LogLevel_Error) {
 		fprintf(stdout, "%s\n", Log_Buffer);
+		fflush(stdout);
 	} else {
 		fprintf(stderr, "%s\n", Log_Buffer);
+		fflush(stderr);
 	}
 }

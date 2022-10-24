@@ -74,6 +74,10 @@ STATIC_ASSERT(sizeof(void*) == 8, "Nara does not support 32-bit platforms!");
 #	endif
 #endif
 
+#if defined(_DEBUG) && !defined(NARA_DEBUG)
+#	define NARA_DEBUG 1
+#endif
+
 #ifndef TRUE
 #	define TRUE 1
 #endif

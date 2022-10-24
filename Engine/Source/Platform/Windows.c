@@ -1,12 +1,15 @@
+#include <Nara/Containers/DynArray.h>
 #include <Nara/Core/Input.h>
 #include <Nara/Platform/Platform.h>
 
 #if NARA_WINDOWS
 #	define WIN32_LEAN_AND_MEAN
 #	define NOMINMAX
+#	define VK_USE_PLATFORM_WIN32_KHR
 #	include <Windows.h>
 #	include <WindowsX.h>
 #	include <stdlib.h>
+#	include <Nara/Renderer/Vulkan/VulkanPlatform.h>
 
 typedef struct Platform_StateT {
 	HINSTANCE Instance;
@@ -173,6 +176,10 @@ F64 Platform_GetTime() {
 
 void Platform_Sleep(U64 ms) {
 	Sleep(ms);
+}
+
+void Platform_GetRequiredExtensions(const char*** extensionNames) {
+	DynArray_PushValue(*extensionNames, &VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 }
 
 static LRESULT CALLBACK Platform_Message(HWND hwnd, U32 msg, WPARAM wParam, LPARAM lParam) {
