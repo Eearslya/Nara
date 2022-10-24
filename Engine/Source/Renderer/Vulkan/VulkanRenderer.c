@@ -64,6 +64,10 @@ void Vulkan_LoadInstance() {
 	Load(DestroyInstance);
 	Load(CreateDebugUtilsMessengerEXT);
 	Load(DestroyDebugUtilsMessengerEXT);
+	Load(DestroySurfaceKHR);
+#if NARA_WINDOWS
+	Load(CreateWin32SurfaceKHR);
+#endif
 #undef Load
 }
 
@@ -140,11 +144,15 @@ B8 Vulkan_Initialize() {
 	if (messengerRes != VK_SUCCESS) { return FALSE; }
 #endif
 
+	const VkResult surfaceRes = Platform_CreateSurface(Vulkan, &Vulkan->Surface);
+	if (surfaceRes != VK_SUCCESS) { return FALSE; }
+
 	return TRUE;
 }
 
 void Vulkan_Shutdown() {
 	if (Vulkan->Instance) {
+		if (Vulkan->Surface) { Vulkan->vk.DestroySurfaceKHR(Vulkan->Instance, Vulkan->Surface, &Vulkan->Allocator); }
 #if NARA_DEBUG
 		if (Vulkan->DebugMessenger) {
 			Vulkan->vk.DestroyDebugUtilsMessengerEXT(Vulkan->Instance, Vulkan->DebugMessenger, &Vulkan->Allocator);

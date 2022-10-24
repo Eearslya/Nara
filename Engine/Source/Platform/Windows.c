@@ -182,6 +182,15 @@ void Platform_GetRequiredExtensions(const char*** extensionNames) {
 	DynArray_PushValue(*extensionNames, &VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 }
 
+VkResult Platform_CreateSurface(const VulkanContext* context, VkSurfaceKHR* surface) {
+	const VkWin32SurfaceCreateInfoKHR surfaceCI = {.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+	                                               .pNext     = NULL,
+	                                               .flags     = 0,
+	                                               .hinstance = Platform.Instance,
+	                                               .hwnd      = Platform.Window};
+	return context->vk.CreateWin32SurfaceKHR(context->Instance, &surfaceCI, &context->Allocator, surface);
+}
+
 static LRESULT CALLBACK Platform_Message(HWND hwnd, U32 msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_MOUSEMOVE: {
