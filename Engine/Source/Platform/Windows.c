@@ -1,3 +1,4 @@
+#include <Nara/Core/Input.h>
 #include <Nara/Platform/Platform.h>
 
 #if NARA_WINDOWS
@@ -172,9 +173,46 @@ F64 Platform_GetTime() {
 
 static LRESULT CALLBACK Platform_Message(HWND hwnd, U32 msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
-		case WM_CLOSE:
+		case WM_MOUSEMOVE: {
+			const I32 x = GET_X_LPARAM(lParam);
+			const I32 y = GET_Y_LPARAM(lParam);
+			Input_OnMouseMoved(x, y);
+
+			return 0;
+		} break;
+
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYUP: {
+			const B8 pressed = msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN;
+			const Key key    = (U8) wParam;
+			Input_OnKey(key, pressed);
+
+			return 0;
+		} break;
+
+		case WM_LBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_MBUTTONUP:
+		case WM_RBUTTONUP: {
+			const B8 pressed = msg == WM_LBUTTONDOWN || msg == WM_MBUTTONDOWN || msg == WM_RBUTTONDOWN;
+			const MouseButton button =
+				(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP
+			     ? MouseButton_Left
+			     : (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP ? MouseButton_Middle : MouseButton_Right));
+			Input_OnMouseButton(button, pressed);
+
+			return 0;
+		} break;
+
+		case WM_CLOSE: {
 			PostQuitMessage(0);
-			break;
+
+			return 0;
+		} break;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);

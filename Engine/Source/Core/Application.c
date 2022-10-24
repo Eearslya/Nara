@@ -5,7 +5,14 @@
 #include <Nara/Core/Memory.h>
 #include <Nara/Platform/Platform.h>
 
-static ApplicationConfig Config = {};
+typedef struct ApplicationState {
+	B8 Running;
+} ApplicationState;
+
+static ApplicationConfig Config     = {};
+static ApplicationState Application = {};
+
+B8 Application_OnEvent(U16 code, void* sender, void* listener, EventContext context);
 
 B8 Application_Initialize(const ApplicationConfig* config) {
 	if (!Platform_Initialize(config->Name, config->WindowX, config->WindowY, config->WindowW, config->WindowH)) {
@@ -15,7 +22,8 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 	if (!Event_Initialize()) { return FALSE; }
 	if (!Input_Initialize()) { return FALSE; }
 
-	Platform_MemCopy(&Config, config, sizeof(ApplicationConfig));
+	MemCopy(&Config, config, sizeof(ApplicationConfig));
+	MemZero(&Application, sizeof(Application));
 
 	if (!Config.Initialize()) {
 		LogF("[Application] Application failed to initialize!");
@@ -24,10 +32,18 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 
 	Config.OnResized(config->WindowW, config->WindowH);
 
+	Event_Register(Event_ApplicationQuit, &Application, Application_OnEvent);
+	Event_Register(Event_KeyPressed, &Application, Application_OnEvent);
+	Event_Register(Event_KeyReleased, &Application, Application_OnEvent);
+
 	return TRUE;
 }
 
 void Application_Shutdown() {
+	Event_Unregister(Event_ApplicationQuit, &Application, Application_OnEvent);
+	Event_Unregister(Event_KeyPressed, &Application, Application_OnEvent);
+	Event_Unregister(Event_KeyReleased, &Application, Application_OnEvent);
+
 	Input_Shutdown();
 	Event_Shutdown();
 	Memory_Shutdown();
@@ -37,7 +53,13 @@ void Application_Shutdown() {
 B8 Application_Run() {
 	F64 lastTime = Platform_GetTime();
 
-	while (Platform_Update()) {
+	Application.Running = TRUE;
+	while (Application.Running) {
+		if (!Platform_Update()) {
+			Application.Running = FALSE;
+			break;
+		}
+
 		const F64 now       = Platform_GetTime();
 		const F64 deltaTime = now - lastTime;
 		lastTime            = now;
@@ -56,4 +78,24 @@ B8 Application_Run() {
 	}
 
 	return TRUE;
+}
+
+B8 Application_OnEvent(U16 code, void* sender, void* listener, EventContext context) {
+	switch (code) {
+		case Event_ApplicationQuit: {
+			Application.Running = FALSE;
+
+			return TRUE;
+		} break;
+
+		case Event_KeyPressed: {
+			LogI("[Application] KeyPressed: %u", context.Data.U8[0]);
+		} break;
+
+		case Event_KeyReleased: {
+			LogI("[Application] KeyReleased: %u", context.Data.U8[0]);
+		} break;
+	}
+
+	return FALSE;
 }
