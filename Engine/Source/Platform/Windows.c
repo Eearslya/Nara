@@ -171,6 +171,10 @@ F64 Platform_GetTime() {
 	return (F64) now.QuadPart * Platform.ClockFrequency;
 }
 
+void Platform_Sleep(U64 ms) {
+	Sleep(ms);
+}
+
 static LRESULT CALLBACK Platform_Message(HWND hwnd, U32 msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_MOUSEMOVE: {

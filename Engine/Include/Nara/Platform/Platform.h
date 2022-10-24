@@ -15,3 +15,4 @@ void Platform_MemSet(void* dst, U8 value, U64 size);
 void Platform_MemZero(void* dst, U64 size);
 
 F64 Platform_GetTime();
+void Platform_Sleep(U64 ms);
