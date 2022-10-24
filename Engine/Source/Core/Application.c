@@ -1,5 +1,6 @@
 #include <Nara/Core/Application.h>
 #include <Nara/Core/Event.h>
+#include <Nara/Core/Input.h>
 #include <Nara/Core/Log.h>
 #include <Nara/Core/Memory.h>
 #include <Nara/Platform/Platform.h>
@@ -12,6 +13,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 	}
 	if (!Memory_Initialize()) { return FALSE; }
 	if (!Event_Initialize()) { return FALSE; }
+	if (!Input_Initialize()) { return FALSE; }
 
 	Platform_MemCopy(&Config, config, sizeof(ApplicationConfig));
 
@@ -26,6 +28,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 }
 
 void Application_Shutdown() {
+	Input_Shutdown();
 	Event_Shutdown();
 	Memory_Shutdown();
 	Platform_Shutdown();
@@ -38,6 +41,8 @@ B8 Application_Run() {
 		const F64 now       = Platform_GetTime();
 		const F64 deltaTime = now - lastTime;
 		lastTime            = now;
+
+		Input_Update(deltaTime);
 
 		if (!Config.Update((F32) deltaTime)) {
 			LogF("[Application] Application failed to update!");
