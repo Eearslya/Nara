@@ -1,4 +1,5 @@
 #include <Nara/Core/Application.h>
+#include <Nara/Core/Clock.h>
 #include <Nara/Core/Event.h>
 #include <Nara/Core/Input.h>
 #include <Nara/Core/Log.h>
@@ -7,6 +8,8 @@
 
 typedef struct ApplicationState {
 	B8 Running;
+	Clock Clock;
+	U32 TargetFPS;
 } ApplicationState;
 
 static ApplicationConfig Config     = {};
@@ -30,6 +33,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 		return FALSE;
 	}
 
+	Application.TargetFPS = 60;
 	Config.OnResized(config->WindowW, config->WindowH);
 
 	Event_Register(Event_ApplicationQuit, &Application, Application_OnEvent);
@@ -51,33 +55,55 @@ void Application_Shutdown() {
 }
 
 B8 Application_Run() {
-	F64 lastTime = Platform_GetTime();
-
 	Application.Running = TRUE;
+	Clock_Start(&Application.Clock);
+	Clock_Update(&Application.Clock);
+
+	Clock frameClock;
 	while (Application.Running) {
+		const F64 lastTime = Application.Clock.Elapsed;
+		Clock_Update(&Application.Clock);
+		const F64 now       = Application.Clock.Elapsed;
+		const F64 deltaTime = now - lastTime;
+
+		Clock_Start(&frameClock);
+
 		if (!Platform_Update()) {
 			Application.Running = FALSE;
 			break;
 		}
 
-		const F64 now       = Platform_GetTime();
-		const F64 deltaTime = now - lastTime;
-		lastTime            = now;
-
 		Input_Update(deltaTime);
 
 		if (!Config.Update((F32) deltaTime)) {
 			LogF("[Application] Application failed to update!");
-			return FALSE;
+			break;
 		}
 
 		if (!Config.Render((F32) deltaTime)) {
 			LogF("[Application] Application failed to render!");
-			return FALSE;
+			break;
+		}
+
+		Clock_Update(&frameClock);
+		if (Application.TargetFPS > 0) {
+			const F64 targetSeconds = 1.0 / (F64) Application.TargetFPS;
+			const F64 remainingTime = targetSeconds - frameClock.Elapsed;
+			if (remainingTime > 0.0) {
+				const U64 remainingMs = remainingTime * 1000.0;
+				if (remainingMs > 0.0) { Platform_Sleep(remainingMs - 1); }
+			}
 		}
 	}
 
-	return TRUE;
+	Clock_Stop(&Application.Clock);
+
+	// If we ended the application loop in error, Running will not be reset to FALSE.
+	// This way, if Running is TRUE when we return, we know there was an error.
+	const B8 applicationErrored = Application.Running == TRUE;
+	Application.Running         = FALSE;
+
+	return !applicationErrored;
 }
 
 B8 Application_OnEvent(U16 code, void* sender, void* listener, EventContext context) {
