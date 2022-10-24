@@ -5,6 +5,7 @@
 #include <Nara/Core/Log.h>
 #include <Nara/Core/Memory.h>
 #include <Nara/Platform/Platform.h>
+#include <Nara/Renderer/Renderer.h>
 
 typedef struct ApplicationState {
 	B8 Running;
@@ -24,6 +25,7 @@ B8 Application_Initialize(const ApplicationConfig* config) {
 	if (!Memory_Initialize()) { return FALSE; }
 	if (!Event_Initialize()) { return FALSE; }
 	if (!Input_Initialize()) { return FALSE; }
+	if (!Renderer_Initialize()) { return FALSE; }
 
 	MemCopy(&Config, config, sizeof(ApplicationConfig));
 	MemZero(&Application, sizeof(Application));
@@ -48,6 +50,7 @@ void Application_Shutdown() {
 	Event_Unregister(Event_KeyPressed, &Application, Application_OnEvent);
 	Event_Unregister(Event_KeyReleased, &Application, Application_OnEvent);
 
+	Renderer_Shutdown();
 	Input_Shutdown();
 	Event_Shutdown();
 	Memory_Shutdown();
@@ -82,6 +85,12 @@ B8 Application_Run() {
 
 		if (!Config.Render((F32) deltaTime)) {
 			LogF("[Application] Application failed to render!");
+			break;
+		}
+
+		const RenderPacket packet = {.DeltaTime = deltaTime};
+		if (!Renderer_DrawFrame(&packet)) {
+			LogF("[Application] Renderer system failed to render!");
 			break;
 		}
 
@@ -120,6 +129,8 @@ B8 Application_OnEvent(U16 code, void* sender, void* listener, EventContext cont
 
 		case Event_KeyReleased: {
 			LogI("[Application] KeyReleased: %u", context.Data.U8[0]);
+
+			if (context.Data.U8[0] == Key_F10) { Memory_LogUsage(LogLevel_Info); }
 		} break;
 	}
 
