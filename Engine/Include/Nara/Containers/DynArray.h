@@ -134,51 +134,51 @@ NAPI void _DynArray_Extract(DynArrayT dynArray, U64 index, void* element);
 #define DynArray_CreateWithSize(type, count) _DynArray_CreateSized(sizeof(type), count)
 
 /** Convenience macro for _DynArray_Destroy(). */
-#define DynArray_Destroy(dynArray) _DynArray_Destroy((DynArrayT) dynArray)
+#define DynArray_Destroy(dynArray) _DynArray_Destroy((DynArrayT) &dynArray)
 
 /** Convenience macro for _DynArray_Capacity(). */
-#define DynArray_Capacity(dynArray) _DynArray_Capacity((ConstDynArrayT) dynArray)
+#define DynArray_Capacity(dynArray) _DynArray_Capacity((ConstDynArrayT) &dynArray)
 
 /** Convenience macro for _DynArray_Size(). */
-#define DynArray_Size(dynArray) _DynArray_Size((ConstDynArrayT) dynArray)
+#define DynArray_Size(dynArray) _DynArray_Size((ConstDynArrayT) &dynArray)
 
 /** Convenience macro for _DynArray_Stride(). */
-#define DynArray_Stride(dynArray) _DynArray_Stride((ConstDynArrayT) dynArray)
+#define DynArray_Stride(dynArray) _DynArray_Stride((ConstDynArrayT) &dynArray)
 
 /** Convenience macro for _DynArray_Trim(). */
-#define DynArray_Trim(dynArray) _DynArray_Trim((DynArrayT) dynArray)
+#define DynArray_Trim(dynArray) _DynArray_Trim((DynArrayT) &dynArray)
 
 /** Convenience macro for _DynArray_Resize(). */
-#define DynArray_Resize(dynArray, elementCount) _DynArray_Resize((DynArrayT) dynArray, elementCount)
+#define DynArray_Resize(dynArray, elementCount) _DynArray_Resize((DynArrayT) &dynArray, elementCount)
 
 /** Convenience macro for _DynArray_Reserve(). */
-#define DynArray_Reserve(dynArray, elementCount) _DynArray_Reserve((DynArrayT) dynArray, elementCount)
+#define DynArray_Reserve(dynArray, elementCount) _DynArray_Reserve((DynArrayT) &dynArray, elementCount)
 
 /** Convenience macro for _DynArray_Push(). */
-#define DynArray_Push(dynArray, element) _DynArray_Push((DynArrayT) dynArray, (const void*) &element)
+#define DynArray_Push(dynArray, element) _DynArray_Push((DynArrayT) &dynArray, (const void*) &element)
 
 /** Convenience macro for _DynArray_Push(). */
-#define DynArray_PushValue(dynArray, element)                     \
-	do {                                                            \
-		typeof(element) _daTemp = (element);                          \
-		_DynArray_Push((DynArrayT) dynArray, (const void*) &_daTemp); \
+#define DynArray_PushValue(dynArray, element)                      \
+	do {                                                             \
+		typeof(element) _daTemp = (element);                           \
+		_DynArray_Push((DynArrayT) &dynArray, (const void*) &_daTemp); \
 	} while (0)
 
 /** Convenience macro for _DynArray_Insert(). */
-#define DynArray_Insert(dynArray, index, element) _DynArray_Insert((DynArrayT) dynArray, index, (const void*) &element)
+#define DynArray_Insert(dynArray, index, element) _DynArray_Insert((DynArrayT) &dynArray, index, (const void*) &element)
 
 /** Convenience macro for _DynArray_Insert(). */
-#define DynArray_InsertValue(dynArray, index, element)                     \
-	do {                                                                     \
-		typeof(element) _daTemp = (element);                                   \
-		_DynArray_Insert((DynArrayT) dynArray, index, (const void*) &_daTemp); \
+#define DynArray_InsertValue(dynArray, index, element)                      \
+	do {                                                                      \
+		typeof(element) _daTemp = (element);                                    \
+		_DynArray_Insert((DynArrayT) &dynArray, index, (const void*) &_daTemp); \
 	} while (0)
 
 /** Convenience macro for _DynArray_Pop(). */
-#define DynArray_Pop(dynArray, element) _DynArray_Pop((DynArrayT) dynArray, (void*) element)
+#define DynArray_Pop(dynArray, element) _DynArray_Pop((DynArrayT) &dynArray, (void*) element)
 
 /** Convenience macro for _DynArray_Extract(). */
-#define DynArray_Extract(dynArray, index, element) _DynArray_Extract((DynArrayT) dynArray, index, (void*) element)
+#define DynArray_Extract(dynArray, index, element) _DynArray_Extract((DynArrayT) &dynArray, index, (void*) element)
 
 /** Convenience macro to erase an element without extracting. */
-#define DynArray_Erase(dynArray, index) _DynArray_Extract((DynArrayT) dynArray, index, NULL)
+#define DynArray_Erase(dynArray, index) _DynArray_Extract((DynArrayT) &dynArray, index, NULL)

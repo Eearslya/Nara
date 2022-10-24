@@ -49,7 +49,7 @@ void* _DynArray_CreateSized(U64 elementSize, U64 elementCount) {
 }
 
 void _DynArray_Destroy(DynArrayT dynArray) {
-	if (dynArray == NULL) { return; }
+	if (dynArray == NULL || *dynArray == NULL) { return; }
 
 	DynArrayMetadata* meta = DynArrayGetMetadata(*dynArray);
 
