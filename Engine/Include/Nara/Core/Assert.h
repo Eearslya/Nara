@@ -5,9 +5,9 @@
 #ifdef NARA_ASSERTIONS
 #	ifdef _MSC_VER
 #		include <intrin.h>
-#		define DebugBreak() __debugbreak()
+#		define NaraDebugBreak() __debugbreak()
 #	else
-#		define DebugBreak() __builtin_trap()
+#		define NaraDebugBreak() __builtin_trap()
 #	endif
 
 NAPI void Nara_AssertFailure(const char* expr, const char* msg, const char* file, I32 line);
@@ -16,7 +16,7 @@ NAPI void Nara_AssertFailure(const char* expr, const char* msg, const char* file
 		do {                                                   \
 			if (!(expr)) {                                       \
 				Nara_AssertFailure(#expr, "", __FILE__, __LINE__); \
-				DebugBreak();                                      \
+				NaraDebugBreak();                                  \
 				abort();                                           \
 			}                                                    \
 		} while (0)
@@ -24,7 +24,7 @@ NAPI void Nara_AssertFailure(const char* expr, const char* msg, const char* file
 		do {                                                    \
 			if (!(expr)) {                                        \
 				Nara_AssertFailure(#expr, msg, __FILE__, __LINE__); \
-				DebugBreak();                                       \
+				NaraDebugBreak();                                   \
 				abort();                                            \
 			}                                                     \
 		} while (0)
@@ -34,7 +34,7 @@ NAPI void Nara_AssertFailure(const char* expr, const char* msg, const char* file
 			do {                                                   \
 				if (!(expr)) {                                       \
 					Nara_AssertFailure(#expr, "", __FILE__, __LINE__); \
-					DebugBreak();                                      \
+					NaraDebugBreak();                                  \
 					abort();                                           \
 				}                                                    \
 			} while (0)
@@ -42,7 +42,7 @@ NAPI void Nara_AssertFailure(const char* expr, const char* msg, const char* file
 			do {                                                    \
 				if (!(expr)) {                                        \
 					Nara_AssertFailure(#expr, msg, __FILE__, __LINE__); \
-					DebugBreak();                                       \
+					NaraDebugBreak();                                   \
 					abort();                                            \
 				}                                                     \
 			} while (0)

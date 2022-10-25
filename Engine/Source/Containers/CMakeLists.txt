@@ -1,2 +1,3 @@
 target_sources(Nara PRIVATE
-	DynArray.c)
+	DynArray.c
+	String.c)

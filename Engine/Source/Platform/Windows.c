@@ -117,12 +117,11 @@ B8 Platform_Update() {
 
 void* Platform_Allocate(U64 size, U64 alignment) {
 	void** place   = NULL;
-	uintptr_t addr = 0;
 	void* ptr      = malloc(alignment + size + sizeof(uintptr_t));
 
 	if (ptr == NULL) { return NULL; }
 
-	addr      = ((uintptr_t) ptr + sizeof(uintptr_t) + alignment) & ~(alignment - 1);
+	uintptr_t addr      = ((uintptr_t) ptr + sizeof(uintptr_t) + alignment) & ~(alignment - 1);
 	place     = (void**) addr;
 	place[-1] = ptr;
 
@@ -132,16 +131,16 @@ void* Platform_Allocate(U64 size, U64 alignment) {
 void* Platform_Reallocate(void* ptr, U64 size, U64 alignment) {
 	if (ptr == NULL) { return Platform_Allocate(size, alignment); }
 
-	void** p = (void**) ptr;
-	ptr      = p[-1];
+	void** place = (void**) ptr;
+	ptr = realloc(place[-1], alignment + size + sizeof(uintptr_t));
 
-	const U64 actualSize = size + alignment + sizeof(uintptr_t);
-	void* newPtr         = realloc(ptr, actualSize);
-	uintptr_t userPtr    = ((uintptr_t) newPtr + sizeof(uintptr_t) + alignment) & ~(alignment - 1);
-	p                    = (void**) newPtr;
-	p[-1]                = newPtr;
+	if (ptr == NULL) { return NULL; }
 
-	return (void*) userPtr;
+	uintptr_t addr      = ((uintptr_t) ptr + sizeof(uintptr_t) + alignment) & ~(alignment - 1);
+	place     = (void**) addr;
+	place[-1] = ptr;
+
+	return (void*) addr;
 }
 
 void Platform_Free(void* ptr) {
@@ -182,7 +181,7 @@ void Platform_GetRequiredExtensions(const char*** extensionNames) {
 	DynArray_PushValue(*extensionNames, &VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 }
 
-VkResult Platform_CreateSurface(const VulkanContext* context, VkSurfaceKHR* surface) {
+VkResult Platform_CreateSurface(const VulkanContext context, VkSurfaceKHR* surface) {
 	const VkWin32SurfaceCreateInfoKHR surfaceCI = {.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
 	                                               .pNext     = NULL,
 	                                               .flags     = 0,
